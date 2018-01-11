@@ -10,7 +10,6 @@ extern crate tokio_core;
 
 use std::str;
 use std::error::Error;
-//use serde_json::Error;
 use clap::{App, Arg};
 use std::io;
 use futures::{Future, Stream};
@@ -116,7 +115,6 @@ fn main() {
     if sub_exists(&domain_records, subdomain.to_string()) {
         println!("subdomain exists, updating...");
         let sub_id = get_sub_id(&domain_records, subdomain.to_string());
-        //println!("updating id: {}", &*sub_id);
         let json_data = "{\"data\":\"".to_string() + &*current_ip + "\"}";
         // update subdomain
         match http_req(
