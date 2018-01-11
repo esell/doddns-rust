@@ -77,7 +77,7 @@ fn main() {
 
     // Get current IP
     let current_ip = match http_req(
-        String::from("GET"),
+        Method::Get,
         String::from("https://api.ipify.org?format=json"),
         false,
         String::from(api_key),
@@ -95,7 +95,7 @@ fn main() {
 
     // Get current Domain Records
     let domain_records = match http_req(
-        String::from("GET"),
+        Method::Get,
         String::from(
             "https://api.digitalocean.com/v2/domains/".to_string() + domain_name + "/records",
         ),
@@ -118,7 +118,7 @@ fn main() {
         let json_data = "{\"data\":\"".to_string() + &*current_ip + "\"}";
         // update subdomain
         match http_req(
-            String::from("PUT"),
+            Method::Put,
             String::from(
                 "https://api.digitalocean.com/v2/domains/".to_string() + domain_name + "/records/"
                     + &*sub_id.trim(),
@@ -139,7 +139,7 @@ fn main() {
             + "\",\"priority\":null,\"port\":null,\"weight\":null, \"ttl\":300, \"tag\":null}";
         // create subdomain
         match http_req(
-            String::from("POST"),
+            Method::Post,
             String::from(
                 "https://api.digitalocean.com/v2/domains/".to_string() + domain_name + "/records",
             ),
@@ -156,7 +156,7 @@ fn main() {
 }
 
 fn http_req(
-    verb: String,
+    verb: Method,
     uri: String,
     auth: bool,
     api_key: String,
@@ -168,14 +168,7 @@ fn http_req(
         .connector(HttpsConnector::new(4, &handle)?)
         .build(&handle);
     let url: Uri = uri.parse()?;
-    let mut req: Request;
-    if verb == "POST" {
-        req = Request::new(Method::Post, url);
-    } else if verb == "PUT" {
-        req = Request::new(Method::Put, url);
-    } else {
-        req = Request::new(Method::Get, url);
-    }
+    let mut req = Request::new(verb, url);
     if auth {
         req.headers_mut().set(ContentType::json());
         req.headers_mut().set(Authorization(Bearer {
