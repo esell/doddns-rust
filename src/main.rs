@@ -5,6 +5,7 @@ extern crate hyper_tls;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
 extern crate serde_json;
 extern crate tokio_core;
 
@@ -115,17 +116,17 @@ fn main() {
     if sub_exists(&domain_records, subdomain.to_string()) {
         println!("subdomain exists, updating...");
         let sub_id = get_sub_id(&domain_records, subdomain.to_string());
-        let json_data = "{\"data\":\"".to_string() + &*current_ip + "\"}";
+        let json_data = json!({"data": &*current_ip});
         // update subdomain
         match http_req(
             Method::Put,
             String::from(
                 "https://api.digitalocean.com/v2/domains/".to_string() + domain_name + "/records/"
-                    + &*sub_id.trim(),
+                    + &*sub_id,
             ),
             true,
             String::from(api_key),
-            String::from(json_data),
+            json_data.to_string(),
         ) {
             Ok(s) => {
                 println!("update success {}", str::from_utf8(&s).unwrap());
@@ -134,9 +135,16 @@ fn main() {
         };
     } else {
         println!("subdomain does NOT exist, creating...");
-        let json_data = "{\"type\":\"A\",\"name\":\"".to_string() + subdomain + "\",\"data\":\""
-            + &*current_ip
-            + "\",\"priority\":null,\"port\":null,\"weight\":null, \"ttl\":300, \"tag\":null}";
+        let json_data = json!({
+            "type": "A",
+            "name": subdomain,
+            "data": &*current_ip,
+            "priority": null,
+            "port": null,
+            "weight": null,
+            "ttl": 300,
+            "tag": null
+        });
         // create subdomain
         match http_req(
             Method::Post,
@@ -145,7 +153,7 @@ fn main() {
             ),
             true,
             String::from(api_key),
-            String::from(json_data),
+            json_data.to_string(),
         ) {
             Ok(s) => {
                 println!("create success {}", str::from_utf8(&s).unwrap());
