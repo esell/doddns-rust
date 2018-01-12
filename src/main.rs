@@ -97,8 +97,9 @@ fn main() {
     // Get current Domain Records
     let domain_records = match http_req(
         Method::Get,
-        String::from(
-            "https://api.digitalocean.com/v2/domains/".to_string() + domain_name + "/records",
+        format!(
+            "https://api.digitalocean.com/v2/domains/{}/records",
+            domain_name
         ),
         true,
         String::from(api_key),
@@ -120,9 +121,9 @@ fn main() {
         // update subdomain
         match http_req(
             Method::Put,
-            String::from(
-                "https://api.digitalocean.com/v2/domains/".to_string() + domain_name + "/records/"
-                    + &*sub_id,
+            format!(
+                "https://api.digitalocean.com/v2/domains/{}/records/{}",
+                domain_name, &*sub_id
             ),
             true,
             String::from(api_key),
@@ -148,8 +149,9 @@ fn main() {
         // create subdomain
         match http_req(
             Method::Post,
-            String::from(
-                "https://api.digitalocean.com/v2/domains/".to_string() + domain_name + "/records",
+            format!(
+                "https://api.digitalocean.com/v2/domains/{}/records",
+                domain_name
             ),
             true,
             String::from(api_key),
