@@ -195,12 +195,14 @@ fn http_req(
 }
 
 fn sub_exists(records: &Vec<DomainRecord>, subdomain: String) -> bool {
-    for element in records.iter() {
-        if element.name == subdomain {
-            return true;
-        }
+    if records
+        .iter()
+        .find(|element| element.name == subdomain)
+        .is_some()
+    {
+        return true;
     }
-    false
+    return false;
 }
 
 fn get_sub_id(records: &Vec<DomainRecord>, subdomain: String) -> String {
